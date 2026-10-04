@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import ru.helper.vkimageloader.dto.vk.ConversionsResponse;
 import ru.helper.vkimageloader.dto.vk.HistoryAttachmentsResponse;
 
-@FeignClient(name = "vk-api", url = "${vk.api}")
+@FeignClient(name = "vk-api", url = "${spring.client.vk.api}")
 public interface VkApiClient {
 
     @PostMapping(

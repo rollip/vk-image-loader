@@ -3,7 +3,7 @@ package ru.helper.vkimageloader.client.wrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import ru.helper.vkimageloader.VkTokenHolder;
+import ru.helper.vkimageloader.helper.VkTokenHolder;
 import ru.helper.vkimageloader.client.VkApiClient;
 import ru.helper.vkimageloader.dto.business.ConversationToCli;
 import ru.helper.vkimageloader.dto.vk.ConversionsResponse;

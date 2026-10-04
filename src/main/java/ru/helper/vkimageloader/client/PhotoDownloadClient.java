@@ -1,4 +1,4 @@
-package ru.helper.vkimageloader.helper;
+package ru.helper.vkimageloader.client;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.retry.annotation.Backoff;
@@ -9,7 +9,7 @@ import org.springframework.web.client.RestClientException;
 
 @Slf4j
 @Component
-public class PhotoDownloadHelper {
+public class PhotoDownloadClient {
 
     private final RestClient restClient = RestClient.create();
 

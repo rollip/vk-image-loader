@@ -1,10 +1,12 @@
 spring:
   application:
     name: vk-image-loader
+    threads: 10
 
-vk:
-  api: https://api.vk.ru
-  auth: https://login.vk.ru
+  client:
+    vk:
+      api: https://api.vk.ru
+      auth: https://login.vk.ru
 
 #logging:
 #  level:

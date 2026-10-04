@@ -1,4 +1,4 @@
-package ru.helper.vkimageloader;
+package ru.helper.vkimageloader.helper;
 
 import lombok.Getter;
 import lombok.Setter;
