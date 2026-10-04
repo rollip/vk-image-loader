@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.helper.vkimageloader.client.wrapper.VkApiClientWrapper;
 import ru.helper.vkimageloader.client.wrapper.VkAuthClientWrapper;
+import ru.helper.vkimageloader.dto.business.ConversationToCli;
 import ru.helper.vkimageloader.dto.business.PhotoToDownload;
 import ru.helper.vkimageloader.dto.vk.HistoryAttachmentsResponse;
 import ru.helper.vkimageloader.facade.VkLoaderFacade;
@@ -31,12 +32,12 @@ public class VkLoaderFacadeImpl implements VkLoaderFacade {
     private final VkAuthClientWrapper vkAuthClientWrapper;
     private final DownloadSpeedCounter downloadSpeedCounter;
 
-    public void loadPhotos() {
-
+    public void loadPhotos(Long peerId) {
+        downloadSpeedCounter.start();
         String startFrom = "0";
         List<PhotoToDownload> photoToDownloads = new ArrayList<>();
         while (Objects.nonNull(startFrom)) {
-            HistoryAttachmentsResponse responseDto = vkApiClientWrapper.getHistoryAttachments(startFrom);
+            HistoryAttachmentsResponse responseDto = vkApiClientWrapper.getHistoryAttachments(peerId, startFrom);
 
             if (Objects.isNull(responseDto.response())) {
                 vkAuthClientWrapper.refreshToken();
@@ -58,6 +59,7 @@ public class VkLoaderFacadeImpl implements VkLoaderFacade {
         downloadSpeedCounter.setTotalFiles(photoToDownloads.size());
 
         processAll(photoToDownloads);
+        downloadSpeedCounter.stop();
     }
 
     private void processAll(List<PhotoToDownload> photos) {
@@ -103,5 +105,10 @@ public class VkLoaderFacadeImpl implements VkLoaderFacade {
         } catch (Exception e) {
             log.error("Failed to download photo {}: {}", photo.id(), e.getMessage());
         }
+    }
+
+    public List<ConversationToCli> getConversations(){
+        vkAuthClientWrapper.refreshToken();
+        return vkApiClientWrapper.getConversationsCli();
     }
 }

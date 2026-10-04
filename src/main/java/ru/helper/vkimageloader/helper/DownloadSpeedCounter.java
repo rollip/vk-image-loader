@@ -1,7 +1,5 @@
 package ru.helper.vkimageloader.helper;
 
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -22,8 +20,7 @@ public class DownloadSpeedCounter {
     private final ScheduledExecutorService scheduler =
             Executors.newSingleThreadScheduledExecutor();
 
-    @PostConstruct
-    void start() {
+    public void start() {
         scheduler.scheduleAtFixedRate(this::logSpeed, 5, 5, TimeUnit.SECONDS);
     }
 
@@ -44,24 +41,27 @@ public class DownloadSpeedCounter {
 
         long currentFiles = files.get();
         long total = totalFiles.get();
-        double elapsedSeconds = (System.nanoTime() - startTime) / 1_000_000_000.0;
-        double filesPerSecond = currentFiles / elapsedSeconds;
+        long elapsedSeconds = (System.nanoTime() - startTime) / 1_000_000_000;
+        double filesPerSecond = (double) currentFiles / elapsedSeconds;
         double percentage = (double) currentFiles / total * 100.0;
-        double remainingFiles = total - currentFiles;
-        double eta = remainingFiles / filesPerSecond / 60;
+
+        long remainingFiles = total - currentFiles;
+        int totalSeconds = (int) (remainingFiles / filesPerSecond);
+        int etaMin = totalSeconds / 60;
+        int etaSec = totalSeconds % 60;
 
         log.info(
-                "Download: {} files/sec, files {} / {} ({}%), ETA: {} min",
+                "Download: {} files/sec, files {} / {} ({}%), ETA: {} min {} sec",
                 String.format("%.2f", filesPerSecond),
                 currentFiles,
                 total,
                 String.format("%.2f", percentage),
-                String.format("%.2f", eta)
+                etaMin,
+                etaSec
         );
     }
 
-    @PreDestroy
-    void stop() {
+    public void stop() {
         scheduler.shutdownNow();
     }
 }

@@ -34,7 +34,22 @@ public class StartupComponent {
         tokenHolder.setCookie(cookie);
 
         log.info("Cookie accepted.");
-        log.info("Starting downloader...");
-        vkLoaderFacade.loadPhotos();
+        log.info("Available chats: ");
+        vkLoaderFacade.getConversations().forEach(c -> {
+            if (!"UNKNOWN".equals(c.title())) {
+                log.info("Title: {}, peerId: {}", c.title(), c.peerId());
+            }
+        });
+
+        log.info("Enter chat to parse: ");
+        String chatToParse = scanner.nextLine().trim();
+
+        if (chatToParse.isBlank()) {
+            throw new IllegalArgumentException("ChatToParse cannot be empty");
+        }
+
+        log.info("Start parsing...");
+        vkLoaderFacade.loadPhotos(Long.parseLong(chatToParse));
+        log.info("Parsing finished.");
     }
 }

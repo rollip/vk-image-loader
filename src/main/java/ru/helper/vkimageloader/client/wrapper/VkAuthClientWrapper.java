@@ -27,6 +27,7 @@ public class VkAuthClientWrapper {
         }
         if (Objects.nonNull(accessToken.error_info())) {
             log.error(accessToken.error_info());
+            throw new RuntimeException(accessToken.error_info());
         }
         if (Objects.nonNull(accessToken.data())) {
             vkTokenHolder.setAccessToken(accessToken.data().accessToken());

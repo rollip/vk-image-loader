@@ -5,6 +5,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
+import ru.helper.vkimageloader.dto.vk.ConversionsResponse;
 import ru.helper.vkimageloader.dto.vk.HistoryAttachmentsResponse;
 
 @FeignClient(name = "vk-api", url = "${vk.api}")
@@ -24,5 +25,19 @@ public interface VkApiClient {
             @RequestParam("count") int count,
             @RequestParam("photo_sizes") int photoSizes,
             @RequestParam(value = "start_from", required = false) String startFrom
+    );
+
+
+    @PostMapping(
+            value = "/method/messages.getConversations",
+            consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE
+    )
+    ConversionsResponse getConversations(
+            @RequestHeader("authorization") String authorization,
+            @RequestHeader("access_token") String accessToken,
+            @RequestHeader("origin") String origin,
+            @RequestParam("v") String version,
+            @RequestParam("count") Integer count,
+            @RequestParam("extended") Integer extended
     );
 }
