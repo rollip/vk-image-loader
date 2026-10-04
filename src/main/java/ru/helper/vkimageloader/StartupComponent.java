@@ -5,10 +5,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+import ru.helper.vkimageloader.dto.business.ConversationToCli;
 import ru.helper.vkimageloader.facade.VkLoaderFacade;
 import ru.helper.vkimageloader.helper.VkTokenHolder;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Scanner;
 
 @Component
@@ -16,6 +18,7 @@ import java.util.Scanner;
 @Slf4j
 public class StartupComponent {
 
+    public static final String EXIT = "exit";
     private final VkTokenHolder tokenHolder;
     private final VkLoaderFacade vkLoaderFacade;
 
@@ -36,21 +39,25 @@ public class StartupComponent {
 
         log.info("Cookie accepted.");
         log.info("Available chats: ");
-        vkLoaderFacade.getConversations().forEach(c -> {
-            if (!"UNKNOWN".equals(c.title())) {
-                log.info("Title: {}, peerId: {}", c.title(), c.peerId());
+        List<ConversationToCli> conversations = vkLoaderFacade.getConversations();
+        String chatToParse;
+        do {
+            conversations.forEach(c -> {
+                if (!"UNKNOWN".equals(c.title())) {
+                    log.info("Title: {}, peerId: {}", c.title(), c.peerId());
+                }
+            });
+
+            log.info("Enter chat to parse: ");
+            chatToParse = scanner.nextLine().trim();
+
+            if (chatToParse.isBlank()) {
+                throw new IllegalArgumentException("ChatToParse cannot be empty");
             }
-        });
 
-        log.info("Enter chat to parse: ");
-        String chatToParse = scanner.nextLine().trim();
-
-        if (chatToParse.isBlank()) {
-            throw new IllegalArgumentException("ChatToParse cannot be empty");
-        }
-
-        log.info("Start parsing...");
-        vkLoaderFacade.loadPhotos(Long.parseLong(chatToParse));
-        log.info("Parsing finished.");
+            log.info("Start parsing...");
+            vkLoaderFacade.loadPhotos(Long.parseLong(chatToParse));
+            log.info("Parsing finished.");
+        } while (!(EXIT.equals(chatToParse)));
     }
 }

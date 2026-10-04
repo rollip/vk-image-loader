@@ -10,7 +10,7 @@ import java.util.concurrent.Executors;
 @Configuration
 public class ExecutorConfig {
     
-    @Value("${spring.application.threads: 2}")
+    @Value("${spring.application.executor-threads: 2}")
     private int threads;
 
     @Bean

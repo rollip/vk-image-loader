@@ -47,14 +47,15 @@ public class PhotoDownloadProcessorImpl implements PhotoDownloadProcessor {
 
     private void downloadPhoto(PhotoToDownload photo) {
         try {
-            if (fileSaverHelper.fileExists(photo.id() + ".jpg", photo.date())) {
-                log.info("File exists {}", photo.id() + ".jpg");
+            String fileName = photo.id() + ".jpg";
+            if (fileSaverHelper.fileExists(fileName, photo.date())) {
+                log.info("File exists {}", fileName);
                 downloadSpeedCounter.decrementTotal();
                 return;
             }
 
             byte[] bytes = photoDownloadClient.download(photo.url());
-            fileSaverHelper.saveFile(bytes, photo.id() + ".jpg", photo.date());
+            fileSaverHelper.saveFile(bytes, fileName, photo.date());
             downloadSpeedCounter.increment();
 
         } catch (Exception e) {
