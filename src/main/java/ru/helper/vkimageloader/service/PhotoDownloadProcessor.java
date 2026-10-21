@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface PhotoDownloadProcessor {
 
-    void processAll(List<PhotoToDownload> photoToDownloads);
+    void processAll(List<PhotoToDownload> photoToDownloads, Long peerId);
 }

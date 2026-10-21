@@ -1,6 +1,7 @@
 package ru.helper.vkimageloader.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.helper.vkimageloader.client.wrapper.VkApiClientWrapper;
 import ru.helper.vkimageloader.client.wrapper.VkAuthClientWrapper;
@@ -15,6 +16,7 @@ import java.util.Objects;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class PhotoFinderProcessorImpl implements PhotoFinderProcessor {
 
     private final VkApiClientWrapper vkApiClientWrapper;
@@ -22,8 +24,10 @@ public class PhotoFinderProcessorImpl implements PhotoFinderProcessor {
 
     public List<PhotoToDownload> findPhotos(Long peerId) {
         String startFrom = "0";
+        log.info("Start counting photos...");
         List<PhotoToDownload> photoToDownloads = new ArrayList<>();
         while (Objects.nonNull(startFrom)) {
+            log.debug("Counting photos: {}", startFrom);
             HistoryAttachmentsResponse responseDto = vkApiClientWrapper.getHistoryAttachments(peerId, startFrom);
 
             if (Objects.isNull(responseDto.response())) {
@@ -42,6 +46,7 @@ public class PhotoFinderProcessorImpl implements PhotoFinderProcessor {
 
             photoToDownloads.addAll(batch);
         }
+        log.info("Total photos: {}", photoToDownloads.size());
         return photoToDownloads;
     }
 

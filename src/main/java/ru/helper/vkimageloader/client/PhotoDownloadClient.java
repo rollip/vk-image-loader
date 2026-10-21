@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 
@@ -15,6 +16,7 @@ public class PhotoDownloadClient {
 
     @Retryable(
             retryFor = RestClientException.class,
+            noRetryFor = HttpClientErrorException.NotFound.class,
             maxAttempts = 5,
             backoff = @Backoff(delay = 1000, multiplier = 3)
     )

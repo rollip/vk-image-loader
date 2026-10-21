@@ -2,28 +2,24 @@ package ru.helper.vkimageloader;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
-import ru.helper.vkimageloader.dto.business.ConversationToCli;
 import ru.helper.vkimageloader.facade.VkLoaderFacade;
 import ru.helper.vkimageloader.helper.VkTokenHolder;
 
-import java.io.IOException;
-import java.util.List;
 import java.util.Scanner;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class StartupComponent {
+public class CliRunner implements CommandLineRunner {
 
     public static final String EXIT = "exit";
     private final VkTokenHolder tokenHolder;
     private final VkLoaderFacade vkLoaderFacade;
 
-    @EventListener(ApplicationReadyEvent.class)
-    public void start() throws IOException, InterruptedException {
+    @Override
+    public void run(String... args) {
         Scanner scanner = new Scanner(System.in);
 
         log.info("=== VK Downloader ===");
@@ -39,25 +35,33 @@ public class StartupComponent {
 
         log.info("Cookie accepted.");
         log.info("Available chats: ");
-        List<ConversationToCli> conversations = vkLoaderFacade.getConversations();
+
         String chatToParse;
         do {
-            conversations.forEach(c -> {
-                if (!"UNKNOWN".equals(c.title())) {
-                    log.info("Title: {}, peerId: {}", c.title(), c.peerId());
-                }
-            });
-
-            log.info("Enter chat to parse: ");
+            log.info("Enter peerId to parse (or type 'exit' to quit): ");
             chatToParse = scanner.nextLine().trim();
 
             if (chatToParse.isBlank()) {
-                throw new IllegalArgumentException("ChatToParse cannot be empty");
+                log.warn("ChatToParse cannot be empty. Try again.");
+                continue;
             }
 
-            log.info("Start parsing...");
-            vkLoaderFacade.loadPhotos(Long.parseLong(chatToParse));
-            log.info("Parsing finished.");
-        } while (!(EXIT.equals(chatToParse)));
+            if (EXIT.equalsIgnoreCase(chatToParse)) {
+                break;
+            }
+
+            log.info("Start parsing for peerId: {}...", chatToParse);
+            try {
+                vkLoaderFacade.loadPhotos(Long.parseLong(chatToParse));
+                log.info("Parsing finished.");
+            } catch (NumberFormatException e) {
+                log.error("Invalid peerId format. Please enter a valid number.");
+            } catch (Exception e) {
+                log.error("Error occurred during parsing: {}", e.getMessage(), e);
+            }
+
+        } while (true);
+
+        log.info("Exiting application...");
     }
 }

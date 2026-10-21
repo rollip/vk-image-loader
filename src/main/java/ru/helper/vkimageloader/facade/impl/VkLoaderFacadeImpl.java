@@ -25,7 +25,7 @@ public class VkLoaderFacadeImpl implements VkLoaderFacade {
 
     public void loadPhotos(Long peerId) {
         List<PhotoToDownload> photos = photoFinderProcessor.findPhotos(peerId);
-        photoDownloadProcessor.processAll(photos);
+        photoDownloadProcessor.processAll(photos, peerId);
     }
 
     public List<ConversationToCli> getConversations(){

@@ -23,43 +23,43 @@ public class PhotoDownloadProcessorImpl implements PhotoDownloadProcessor {
     private final ExecutorService photoDownloadExecutor;
     private final DownloadSpeedCounter downloadSpeedCounter;
 
-    public void processAll(List<PhotoToDownload> photos) {
-        downloadSpeedCounter.setTotalFiles(photos.size());
-        downloadSpeedCounter.start();
+    public void processAll(List<PhotoToDownload> photos, Long peerId) {
+        downloadSpeedCounter.start(photos.size());
         int batchSize = 200;
         for (int i = 0; i < photos.size(); i += batchSize) {
             int end = Math.min(i + batchSize, photos.size());
             List<PhotoToDownload> batch = photos.subList(i, end);
-            processBatch(batch);
+            processBatch(batch, peerId);
         }
         downloadSpeedCounter.stop();
     }
 
 
-    private void processBatch(List<PhotoToDownload> batch) {
+    private void processBatch(List<PhotoToDownload> batch, Long peerId) {
         List<CompletableFuture<Void>> futures = batch.stream()
                 .map(photo -> CompletableFuture.runAsync(
-                        () -> downloadPhoto(photo), photoDownloadExecutor))
+                        () -> downloadPhoto(photo, peerId), photoDownloadExecutor))
                 .toList();
 
         CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new)).join();
     }
 
-    private void downloadPhoto(PhotoToDownload photo) {
+    private void downloadPhoto(PhotoToDownload photo, Long peerId) {
         try {
             String fileName = photo.id() + ".jpg";
-            if (fileSaverHelper.fileExists(fileName, photo.date())) {
-                log.info("File exists {}", fileName);
-                downloadSpeedCounter.decrementTotal();
+            if (fileSaverHelper.fileExists(fileName, photo.date(), peerId)) {
+                log.debug("File exists {}", fileName);
+                downloadSpeedCounter.incrementExisting();
                 return;
             }
 
             byte[] bytes = photoDownloadClient.download(photo.url());
-            fileSaverHelper.saveFile(bytes, fileName, photo.date());
-            downloadSpeedCounter.increment();
+            fileSaverHelper.saveFile(bytes, fileName, photo.date(), peerId);
+            downloadSpeedCounter.incrementDownloaded();
 
         } catch (Exception e) {
-            log.error("Failed to download photo {}: {}", photo.id(), e.getMessage());
+            log.debug("Failed to download photo {}", photo.id());
+            downloadSpeedCounter.incrementFailed();
         }
     }
 }

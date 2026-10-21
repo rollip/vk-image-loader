@@ -8,8 +8,9 @@ spring:
       api: https://api.vk.ru
       auth: https://login.vk.ru
 
-#logging:
-#  level:
+logging:
+  level:
+    ru.helper.vkimageloader: info
 #    org.springframework.retry: DEBUG
 #    ru.helper.vkimageloader.client.VkAuthClient: DEBUG
 #    ru.helper.vkimageloader.client.VkApiClient: DEBUG

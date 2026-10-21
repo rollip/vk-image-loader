@@ -1,20 +1,18 @@
 package ru.helper.vkimageloader.client.wrapper;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import ru.helper.vkimageloader.helper.VkTokenHolder;
 import ru.helper.vkimageloader.client.VkApiClient;
 import ru.helper.vkimageloader.dto.business.ConversationToCli;
 import ru.helper.vkimageloader.dto.vk.ConversionsResponse;
 import ru.helper.vkimageloader.dto.vk.HistoryAttachmentsResponse;
+import ru.helper.vkimageloader.helper.VkTokenHolder;
 
 import java.util.List;
 import java.util.Objects;
 
 @RequiredArgsConstructor
 @Component
-@Slf4j
 public class VkApiClientWrapper {
 
     private final VkApiClient vkApiClient;
@@ -22,7 +20,6 @@ public class VkApiClientWrapper {
     private static final String BEARER_PREFIX = "Bearer ";
 
     public HistoryAttachmentsResponse getHistoryAttachments(Long peerId, String startFrom) {
-        log.info(String.valueOf(startFrom));
         return vkApiClient.getHistoryAttachments(
                 BEARER_PREFIX + vkTokenHolder.getAccessToken(),
                 vkTokenHolder.getAccessToken(),
